@@ -29,6 +29,11 @@ Just type ~make~ and see the magic happen.
 The ~kernel.bin~ binary runs fine under ~qemu~. Use the ~run.sh~ script to
 try it out.
 
+* To-do
+
+You can check out my [[https://trello.com/b/8uHdxFY6/bare-bones-kernel][Trello board]] for this project. I took the
+opportunity to start messing with it, so there goes.
+
 * License
 
 This project is distributed under the MIT License. See LICENSE for

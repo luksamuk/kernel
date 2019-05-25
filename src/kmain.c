@@ -10,10 +10,11 @@ kmain(void)
     kbd_init();
     vga_clear();
 
-    // Prompt
-    vga_print("Hello from my toy kernel! ");
-    vga_print("Type as much as you want...\n");
-    vga_print("Start typing>");
+    vga_print("Kernel v0.0\n");
+    vga_print("Copyright (c) 2019 Lucas Vieira\n\n");
+
+    // Fake REPL
+    vga_print("com> ");
 
     while(1);
 }
