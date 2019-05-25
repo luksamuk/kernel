@@ -1,0 +1,35 @@
+#+TITLE: kernel
+#+AUTHOR: Lucas Vieira
+#+EMAIL: lucasvieira@protonmail.com
+
+* Introduction
+
+This is a toy bare bones kernel written in pure C. Works on x86
+platforms.
+
+This project was inspired on the following articles:
+
+- [[https://arjunsreedharan.org/post/82710718100/kernel-101-lets-write-a-kernel][Kernel 101 – Let’s write a Kernel]]
+- [[https://arjunsreedharan.org/post/99370248137/kernel-201-lets-write-a-kernel-with-keyboard][Kernel 201 – Let’s write a Kernel with keyboard and screen support]]
+
+...plus a few things from [[https://wiki.osdev.org/][OSDev Wiki]].
+
+* Building
+
+You will need:
+
+- ~nasm~
+- ~gcc~
+- ~ld~
+
+Just type ~make~ and see the magic happen.
+
+* Running
+
+The ~kernel.bin~ binary runs fine under ~qemu~. Use the ~run.sh~ script to
+try it out.
+
+* License
+
+This project is distributed under the MIT License. See LICENSE for
+details.
