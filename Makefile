@@ -23,8 +23,8 @@ all: $(BIN)
 %.asm_o: %.asm
 	$(ASM) $(ASMFLAGS) $^ -o $@
 
-kernel: link.ld $(OBJS)
-	ld -m elf_i386 -T link.ld -o kernel $(OBJS)
+$(BIN): link.ld $(OBJS)
+	ld -m elf_i386 -T link.ld -o $(BIN) $(OBJS)
 
 clean:
 	rm -f *.o *.asm_o
