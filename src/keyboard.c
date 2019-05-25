@@ -6,6 +6,32 @@
 #define KBD_STATUS_PORT 0x64
 #define KBD_DATA_PORT   0x60
 
+
+typedef struct {
+    uint8 keystate[128];
+} kbd_state_t;
+
+typedef enum {
+    KBD_CTRL   = 29,
+    KBD_LSHIFT = 42,
+    KBD_RSHIFT = 54,
+    KBD_ALT    = 56,
+    KBD_CAPS   = 58,
+    KBD_HOME   = 71,
+    KBD_END    = 79,
+    KBD_INSERT = 82,
+    KBD_DELETE = 83,
+    KBD_UP     = 72,
+    KBD_LEFT   = 75,
+    KBD_RIGHT  = 77,
+    KBD_DOWN   = 80,
+    KBD_PGUP   = 73,
+    KBD_PGDOWN = 81,
+} kbd_spcl_map;
+
+
+
+
 // Imported from ASM
 extern char read_port(uint16 port);
 extern void write_port(uint16 port, uint8 data);
@@ -39,13 +65,13 @@ uint8 kbd_map[128] =
        0,    0,   0,   0,   0,   0,
 };
 
-/* typedef struct { */
-/*     uint64 lsb; */
-/*     uint64 msb; */
-/*     /\* uint8 bytes[16]; *\/ */
-/* } kbd_state_t; */
+/* Keyboard state for each key on map */
+static kbd_state_t K_ASYNC_KBD_STATE = {0};
 
-/* static kbd_state_t K_ASYNC_KBD_STATE = {0}; */
+/* 0 => Any shift key is being pressed?
+ * 1 => Caps lock is active?             */
+static uint8 K_KBD_SPCL_STATE[2] = {0};
+
 
 void
 kbd_init(void)
@@ -55,6 +81,9 @@ kbd_init(void)
     write_port(0x21, 0xfd);
     disable_cursor();
 }
+
+
+/*  Key dispatch  */
 
 inline bool
 keycode_writable(uint8 keycode)
@@ -66,7 +95,47 @@ keycode_writable(uint8 keycode)
         || (keycode == 74) || (keycode == 78);
 }
 
-static uint8 shift = 0;
+static inline bool
+keycode_pressed(uint8 keycode)
+{
+    return K_ASYNC_KBD_STATE.keystate[keycode];
+}
+
+
+
+static inline bool
+keycode_special_dispatch(uint8 keycode, uint8 pressed)
+{
+    bool ret = 1;
+    switch(keycode) {
+    case KBD_CTRL: break;
+    case KBD_LSHIFT:
+    case KBD_RSHIFT:
+        K_KBD_SPCL_STATE[0] =
+            (K_ASYNC_KBD_STATE.keystate[KBD_LSHIFT]
+             || K_ASYNC_KBD_STATE.keystate[KBD_RSHIFT]);
+        break;
+    case KBD_ALT: break;
+    case KBD_CAPS:
+        if(pressed) {
+            K_KBD_SPCL_STATE[1] = !K_KBD_SPCL_STATE[1];
+        }
+        break;
+    case KBD_HOME: break;
+    case KBD_END: break;
+    case KBD_INSERT: break;
+    case KBD_DELETE: break;
+    case KBD_UP: break;
+    case KBD_LEFT: break;
+    case KBD_RIGHT: break;
+    case KBD_DOWN: break;
+    case KBD_PGUP: break;
+    case KBD_PGDOWN: break;
+    default: ret = 0; break;
+    }
+    return ret;
+}
+
 
 void
 kbd_handler_irq(void)
@@ -74,43 +143,41 @@ kbd_handler_irq(void)
     uint8 status;
     uint8 scancode;
     uint8 keycode;
+    uint8 pressed;
 
     // Signal End Of Interrupt ACK to PIC1
     write_port(0x20, 0x20);
-    
+
+    // Receive key status
     status   = read_port(KBD_STATUS_PORT);
-    scancode = read_port(KBD_DATA_PORT);
-    keycode  = scancode & ~(0x80);
 
-    /* if(scancode < 0) */
-    /*     return; */
-
-    /* if(keycode < 64) { */
-    /*     K_ASYNC_KBD_STATE.lsb = */
-    /*         (K_ASYNC_KBD_STATE.lsb & ~(0x1 << keycode)) */
-    /*         | ((status & 0x01) << keycode); */
-    /* } else { */
-    /*     K_ASYNC_KBD_STATE.msb = */
-    /*         (K_ASYNC_KBD_STATE.msb & ~(0x1 << (keycode - 64))) */
-    /*         | ((status & 0x01) << (keycode - 64)); */
-    /* } */
-
-    if(keycode == 54) {
-        if(scancode & 0x80) // Released
-            shift = 0;
-        else shift = 1;
-    }
-
-    if(scancode & 0x80)
-        return;
+    // If lowest bit of status is null, the buffer
+    // is empty
+    if(!(status & 0x01)) return;
     
-    char key_char = kbd_map[keycode];
+    scancode = read_port(KBD_DATA_PORT);
 
-    if(shift && (key_char >= 'a') && (key_char <= 'z'))
+    // Break scancode state in more elements
+    keycode  = scancode & ~(0x80);
+    pressed  = (scancode & 0x80) ? 0 : 1;
+
+    // Dispatch key state to state holders
+    K_ASYNC_KBD_STATE.keystate[keycode] = pressed;
+    bool is_special = keycode_special_dispatch(keycode, pressed);
+
+    // Do not continue if the key is being released, or is not printable
+    if(!pressed || is_special) return;
+
+    // Print character to VGA; make lowercase change
+    // depending on shift and caps usage
+    char key_char = kbd_map[keycode];
+    bool case_up = K_KBD_SPCL_STATE[0]
+        ? !K_KBD_SPCL_STATE[1]
+        : K_KBD_SPCL_STATE[1];
+    if(case_up && (key_char >= 'a') && (key_char <= 'z'))
         key_char -= 0x20;
 
-    // LSB of status is set when buffer is not empty
-    if((status & 0x01) && keycode_writable(keycode)) {
+    if(keycode_writable(keycode)) {
         vga_putchar(key_char);
     }
 }
