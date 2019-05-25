@@ -4,28 +4,32 @@ CFLAGS   := -m32 -fno-stack-protector -ffreestanding -O2 -Wall -Wextra -fno-exce
 LDD      := ld
 LDDFLAGS := -m elf_i386
 
+ARCH     := x86
 ASM      := nasm
 ASMFLAGS := -f elf32
 
-CSRC     := $(wildcard *.c)
-ASMSRC   := $(wildcard *.asm)
+CSRC     := $(wildcard src/*.c)
+ASMSRC   := $(wildcard src/arch/$(ARCH)/*.asm)
 
-OBJS     := $(ASMSRC:%.asm=%.asm_o) $(CSRC:%.c=%.o)
-BIN      := kernel.bin
+OBJS     := $(ASMSRC:src/arch/$(ARCH)/%.asm=bin/obj/$(ARCH)/%.o) $(CSRC:src/%.c=bin/obj/%.o)
+BIN      := bin/kernel.bin
 
-.PHONY: clean
+.PHONY: dirs clean
 
-all: $(BIN)
+all: dirs $(BIN)
 
-%.o: %.c %.h
+bin/obj/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-%.asm_o: %.asm
+bin/obj/$(ARCH)/%.o: src/arch/$(ARCH)/%.asm
 	$(ASM) $(ASMFLAGS) $^ -o $@
 
-$(BIN): link.ld $(OBJS)
-	ld -m elf_i386 -T link.ld -o $(BIN) $(OBJS)
+$(BIN): src/link.ld $(OBJS)
+	ld -m elf_i386 -T src/link.ld -o $(BIN) $(OBJS)
+
+dirs:
+	mkdir -p bin/obj/$(ARCH)
 
 clean:
-	rm -f *.o *.asm_o
+	rm -rf bin/obj
 
