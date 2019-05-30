@@ -7,13 +7,6 @@
 This is a toy bare bones kernel written in pure C. Works on x86
 platforms.
 
-This project was inspired on the following articles:
-
-- [[https://arjunsreedharan.org/post/82710718100/kernel-101-lets-write-a-kernel][Kernel 101 – Let’s write a Kernel]]
-- [[https://arjunsreedharan.org/post/99370248137/kernel-201-lets-write-a-kernel-with-keyboard][Kernel 201 – Let’s write a Kernel with keyboard and screen support]]
-
-...plus a few things from [[https://wiki.osdev.org/][OSDev Wiki]].
-
 * Building
 
 You will need:
@@ -33,6 +26,17 @@ try it out.
 
 You can check out my [[https://trello.com/b/8uHdxFY6/bare-bones-kernel][Trello board]] for this project. I took the
 opportunity to start messing with it, so there goes.
+
+* Bibliography
+
+- [[https://arjunsreedharan.org/post/82710718100/kernel-101-lets-write-a-kernel][Kernel 101 – Let’s write a Kernel]]
+- [[https://arjunsreedharan.org/post/99370248137/kernel-201-lets-write-a-kernel-with-keyboard][Kernel 201 – Let’s write a Kernel with keyboard and screen support]]
+- [[https://wiki.osdev.org/][OSDev Wiki]]
+  - [[https://wiki.osdev.org/Detecting_Memory_(x86)#Memory_Map_Via_GRUB][Memory Map via GRUB]]
+- COMER, Douglas. /Operating system design: The Xinu approach/. 2nd
+  ed. 2005.
+- [[https://www.gnu.org/software/grub/manual/multiboot/][Multiboot Manual]]
+  - [[https://www.gnu.org/software/grub/manual/multiboot/html_node/Boot-information-format.html#Boot%20information%20format][Boot information format]]
 
 * License
 

@@ -103,3 +103,45 @@ vga_backspace(void)
         VGA_PTR[VGA_POS + 1] = vga_mix_color(VGA_WHITE, VGA_BLACK);
     }
 }
+
+void
+vga_put_uint32(uint32 num)
+{
+    if(num == 0) {
+        vga_putchar('0');
+        return;
+    }
+    int n, alg[20];
+    n = 0;
+    while(num != 0) {
+        int rem = num % 10;
+        num = num / 10;
+        alg[n++] = rem;
+    }
+
+    int i;
+    for(i = n - 1; i >= 0; i--) {
+        vga_putchar('0' + alg[i]);
+    }
+}
+
+void
+vga_put_uint64(uint64 num)
+{
+    if(num == 0) {
+        vga_putchar('0');
+        return;
+    }
+    int n, alg[40];
+    n = 0;
+    while(num != 0) {
+        int rem = num % 10;
+        num = num / 10;
+        alg[n++] = rem;
+    }
+
+    int i;
+    for(i = n - 1; i >= 0; i--) {
+        vga_putchar('0' + alg[i]);
+    }
+}

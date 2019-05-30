@@ -30,5 +30,7 @@ void  vga_print(const char*);
 void  vga_putchar(const char);
 void  vga_newline(void);
 void  vga_backspace(void);
+void  vga_put_uint32(uint32 num);
+void  vga_put_uint64(uint64 num);
 
 #endif

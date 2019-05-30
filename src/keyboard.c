@@ -140,22 +140,23 @@ keycode_special_dispatch(uint8 keycode, uint8 pressed)
 void
 kbd_handler_irq(void)
 {
-    uint8 status;
+    vga_print("Inside\n");
+    //uint8 status;
     uint8 scancode;
     uint8 keycode;
     uint8 pressed;
 
-    // Signal End Of Interrupt ACK to PIC1
-    write_port(0x20, 0x20);
-
     // Receive key status
-    status   = read_port(KBD_STATUS_PORT);
+    //status   = read_port(KBD_STATUS_PORT);
 
     // If lowest bit of status is null, the buffer
     // is empty
-    if(!(status & 0x01)) return;
+    //if(!(status & 0x01)) return;
     
     scancode = read_port(KBD_DATA_PORT);
+
+    // Signal End Of Interrupt ACK to PIC1
+    write_port(0x20, 0x20);
 
     // Break scancode state in more elements
     keycode  = scancode & ~(0x80);

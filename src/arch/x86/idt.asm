@@ -1,5 +1,5 @@
 bits 32
-section .text
+section .irq
 
 global read_port
 global write_port
