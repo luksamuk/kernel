@@ -51,9 +51,20 @@ kdebrief(multiboot_info_t *mbd)
 
             vga_print("      Base address: ");
             vga_put_uint64(mmap[i].addr);
-            vga_print(", length: ");
-            vga_put_uint64(mmap[i].len);
-            vga_print(" bytes\n");
+            vga_print(", length: approx. ");
+
+            char *unit = "Kib";
+            uint32 size = mmap[i].len;
+            size /= 1024;
+
+            if(size > 1024) {
+                size /= 1024;
+                unit = "Mib";
+            }
+            
+            vga_put_uint64(size);
+            vga_print(unit);
+            vga_newline();
 
             /* Extra stuff for memory initialization  */
             if(!mem_init_ok && mmap[i].addr != 0 && mmap[i].type == 1) {
